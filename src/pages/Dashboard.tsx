@@ -149,7 +149,7 @@ export default function Dashboard() {
                   </thead>
                   <tbody>
                     {recent.map((tx) => (
-                      <tr key={tx.id} className="border-t">
+                      <tr key={tx.id} className="hover:bg-slate-50">
                         <Td>
                           <div className="flex items-center gap-3">
                             <img

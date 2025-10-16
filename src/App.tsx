@@ -23,7 +23,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b bg-white">
+      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3  bg-white">
         <button
           onClick={() => setOpen(true)}
           aria-label="Open navigation"
@@ -33,14 +33,13 @@ export default function App() {
         </button>
         <div className="flex items-center gap-2">
           <span className="font-bold">RemitX</span>
-          <span className="text-xs text-slate-500">Secure Cross-Border</span>
         </div>
         <div className="text-xs text-slate-600">{me?.email}</div>
       </header>
 
       <div className="lg:grid lg:grid-cols-[18rem_1fr]">
         {/* Sidebar (desktop) */}
-        <aside className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white border-r">
+        <aside className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white">
           <Brand meEmail={me?.email} />
           <Nav onLogout={onLogout} />
           <UserFooter meEmail={me?.email} onLogout={onLogout} />
@@ -57,13 +56,13 @@ export default function App() {
               className="absolute inset-0 bg-black/30"
               onClick={() => setOpen(false)}
             />
-            <div className="absolute left-0 top-0 h-full w-72 bg-white border-r shadow-xl flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold">RemitX</span>
-                  <span className="text-xs text-slate-500">
+            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex-col items-center gap-2">
+                  <div className="font-bold">RemitX</div>
+                  <div className="text-xs text-slate-500">
                     Secure Cross-Border
-                  </span>
+                  </div>
                 </div>
                 <button
                   ref={closeBtnRef}
