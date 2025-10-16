@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import type { Currency, RecipientCurrency } from "../types";
+import { getApiErrorMessage } from "../utils/errors";
+import { toast } from "react-toastify";
 
 interface RatesState {
   base: Currency | null;
@@ -27,7 +29,7 @@ async function fetchRateOnce(base: string, to: string, date = "latest") {
   for (const url of urls) {
     const res = await fetch(url);
     if (!res.ok) continue;
-    const data = await res.json(); // shape: { date: 'YYYY-MM-DD', <base>: { <to>: number, ... } }
+    const data = await res.json();
     const rate = data?.[baseL]?.[toL];
     if (rate != null) return rate;
   }
@@ -42,10 +44,12 @@ export const useRatesStore = create<RatesState>((set) => ({
   async fetchRate(base, to) {
     set({ loading: true, error: undefined });
     try {
-      const rate = await fetchRateOnce(base, to, "latest"); // or 'YYYY-MM-DD'
+      const rate = await fetchRateOnce(base, to, "latest");
       set({ base, to, rate, loading: false });
     } catch (e: any) {
-      set({ loading: false, error: e?.message ?? "Could not fetch rates" });
+      const message = getApiErrorMessage(e, "Could not fetch rates");
+      set({ loading: false, error: message });
+      toast.error(message, { toastId: "rates-error" });
     }
   },
 }));

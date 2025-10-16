@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Recipient } from "../types";
+import { getApiErrorMessage } from "../utils/errors";
+import { toast } from "react-toastify";
 
 interface RecipientsState {
-  cache: Record<string, Recipient[]>; // keyed by nat (gb, ng, za)
+  cache: Record<string, Recipient[]>;
   loading: boolean;
   error?: string;
   getForCountry: (nat: "gb" | "ng" | "za") => Promise<Recipient[]>;
@@ -14,6 +16,7 @@ export const useRecipientsStore = create<RecipientsState>()(
     (set, get) => ({
       cache: {},
       loading: false,
+      error: undefined,
       async getForCountry(nat) {
         const existing = get().cache[nat];
         if (existing?.length) return existing;
@@ -35,7 +38,9 @@ export const useRecipientsStore = create<RecipientsState>()(
           set({ cache: next, loading: false });
           return mapped;
         } catch (e: any) {
-          set({ loading: false, error: "Could not load recipients" });
+          const message = getApiErrorMessage(e, "Could not load recipients");
+          set({ loading: false, error: message });
+          toast.error(message, { toastId: `recipients-${nat}-error` });
           return [];
         }
       },

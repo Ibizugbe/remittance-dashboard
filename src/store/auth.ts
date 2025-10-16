@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { api } from "../lib/axios";
 import type { AuthTokens, UserProfile } from "../types";
+import { toast } from "react-toastify";
+import { getApiErrorMessage } from "../utils/errors";
 
 interface AuthState {
   tokens: AuthTokens | null;
@@ -24,21 +26,21 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true, error: undefined });
         try {
           const { data } = await api.post("/auth/login", { email, password });
-          // Escuelajs returns access_token
           const tokens: AuthTokens = { access_token: data.access_token };
           set({ tokens, loading: false });
           await get().fetchMe();
+          toast.success("Signed in successfully");
           return true;
         } catch (e: any) {
-          set({
-            loading: false,
-            error: e?.response?.data?.message || "Invalid credentials",
-          });
+          const message = getApiErrorMessage(e, "Invalid credentials");
+          set({ loading: false, error: message });
+          toast.error(message, { toastId: "login-error" });
           return false;
         }
       },
+
       async refresh() {
-        // Demo: no real refresh endpoint on Escuelajs; return false to force re-login if expired
+        // currently there's no real refresh endpoint on Escuelajs; So i return false to force re-login if expired
         return false;
       },
       logout() {
