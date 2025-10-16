@@ -7,6 +7,7 @@ import type { Currency, RecipientCurrency } from "../../types";
 import { Flash, Money4 } from "iconsax-reactjs"; // or: @iconsax/react
 import CurrencyFlag from "../../components/ui/CurrencyFlag";
 import { useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 
 const Schema = Yup.object({
   amount: Yup.number()
@@ -34,6 +35,13 @@ export default function CurrencyStep(props: {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!loading && rate == null && !error)
+      toast.info("Select a pair to see the live rate.", {
+        toastId: "rate-null",
+      });
+  }, [rate, loading, error]);
 
   useEffect(() => {
     // focus and put caret at end on mount

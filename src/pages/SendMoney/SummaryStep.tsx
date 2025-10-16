@@ -6,6 +6,7 @@ import { useTxStore } from "../../store/transactions";
 import type { Currency, RecipientCurrency, Recipient } from "../../types";
 import Card from "../../components/ui/Card";
 import { fmtMoney } from "../../utils/format";
+import { toast } from "react-toastify";
 
 export default function SummaryStep({
   fromAmount,
@@ -47,8 +48,11 @@ export default function SummaryStep({
           status: "success",
         });
         nav(`/success/${ref}`);
+        toast.success("Payment successful");
       },
-      onCancel: () => {},
+      onCancel: () => {
+        toast.info("Payment cancelled.");
+      },
     });
   };
 
