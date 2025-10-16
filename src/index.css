@@ -92,7 +92,7 @@ body {
 }
 
 @utility table-wrap {
-  @apply overflow-hidden rounded-2xl border bg-white shadow-[var(--shadow-card)];
+  @apply overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-card)];
 }
 
 @utility table-base {

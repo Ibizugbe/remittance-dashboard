@@ -4,7 +4,7 @@ export default function EmptyState({
   subtitle = "Start by creating a transfer.",
 }) {
   return (
-    <div className="text-center border border-dashed rounded-2xl p-10 bg-white">
+    <div className="text-center rounded-2xl p-10 bg-white">
       <div className="inline-grid place-items-center h-12 w-12 rounded-full bg-brand-50 mb-3">
         <Box size={22} className="text-brand-600" />
       </div>

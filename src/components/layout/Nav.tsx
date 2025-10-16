@@ -56,7 +56,7 @@ export default function Nav({
         Transactions
       </NavLink>
 
-      <div className="pt-3 mt-3 border-t" />
+      <div className="pt-3 mt-3" />
 
       <button
         onClick={onLogout}
