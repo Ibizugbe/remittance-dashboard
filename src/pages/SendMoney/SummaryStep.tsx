@@ -4,6 +4,8 @@ import { payWithPaystack } from "../../lib/paystack";
 import { useNavigate } from "react-router-dom";
 import { useTxStore } from "../../store/transactions";
 import type { Currency, RecipientCurrency, Recipient } from "../../types";
+import Card from "../../components/ui/Card";
+import { fmtMoney } from "../../utils/format";
 
 export default function SummaryStep({
   fromAmount,
@@ -24,16 +26,16 @@ export default function SummaryStep({
 
   const toAmount = rate ? +(fromAmount * rate).toFixed(2) : 0;
   const reference = `REF_${Date.now()}`;
+  const fee = 0;
 
   const pay = () => {
-    // For demo: Paystack needs NGN amount in kobo; we simulate by multiplying USD-equivalent by 100 and treating as NGN test.
     const amountKobo = Math.max(100, Math.round(toAmount * 100));
     payWithPaystack({
       email: recipient.email || "test@example.com",
       amountKobo,
       reference,
       onSuccess: (ref) => {
-        const tx = {
+        addTx({
           id: ref,
           createdAt: new Date().toISOString(),
           fromAmount,
@@ -42,58 +44,70 @@ export default function SummaryStep({
           toCurrency,
           rate: rate || 0,
           recipient,
-          status: "success" as const,
-        };
-        addTx(tx);
+          status: "success",
+        });
         nav(`/success/${ref}`);
       },
-      onCancel: () => {
-        /* could log */
-      },
+      onCancel: () => {},
     });
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow">
-      <h2 className="font-medium mb-3">Review & Pay</h2>
-      <div className="text-sm grid gap-2">
-        <div className="flex justify-between">
-          <span>Sender</span>
-          <span>
-            {fromAmount} {fromCurrency}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span>Recipient gets</span>
-          <span>
-            {toAmount} {toCurrency}
-          </span>
-        </div>
-        <div className="flex justify-between text-slate-500">
-          <span>Rate</span>
-          <span>
-            1 {fromCurrency} = {rate} {toCurrency}
-          </span>
-        </div>
-        <div className="h-px bg-slate-200 my-2" />
-        <div>
-          <span className="text-slate-500">Recipient</span>
-          <div className="font-medium">{recipient.name}</div>
-          <div className="text-slate-500">{recipient.email}</div>
+    <section className="container-pro">
+      <div className="max-w-3xl mx-auto space-y-4">
+        <h2 className="text-xl font-semibold">Review payment details</h2>
+
+        <Card>
+          <div className="flex items-start justify-between py-2">
+            <span className="text-slate-800">You send</span>
+            <span className="font-semibold">
+              {fmtMoney(fromAmount, fromCurrency)}
+            </span>
+          </div>
+
+          <div className="flex items-start justify-between py-2">
+            <span className="text-slate-800">Transfer fee</span>
+            <span className="text-slate-700">{fmtMoney(fee, toCurrency)}</span>
+          </div>
+
+          <div className="flex items-start justify-between py-2">
+            <span className="text-slate-800">Rate</span>
+            <span className="text-slate-700">
+              {rate != null ? `1 ${fromCurrency} = ${rate} ${toCurrency}` : "—"}
+            </span>
+          </div>
+
+          <div className="my-2 h-px bg-slate-200" />
+          <div className="flex items-start justify-between py-2">
+            <span className="text-slate-800">Send to</span>
+            <div className="text-right">
+              <div className="font-semibold">{recipient.name}</div>
+              {recipient.email && (
+                <div className="text-sm text-slate-500">{recipient.email}</div>
+              )}
+            </div>
+          </div>
+          <div className="mt-2 h-px bg-slate-200" />
+        </Card>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-5">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onBack}
+            className="sm:w-auto w-full"
+          >
+            Back
+          </Button>
+          <Button
+            type="button"
+            onClick={pay}
+            className="sm:min-w-[200px] sm:w-auto w-full"
+          >
+            Send {fmtMoney(toAmount || 0, toCurrency)}
+          </Button>
         </div>
       </div>
-      <div className="mt-4 flex gap-2">
-        <Button
-          type="button"
-          onClick={onBack}
-          className="bg-slate-200 text-slate-900"
-        >
-          Back
-        </Button>
-        <Button type="button" onClick={pay}>
-          Pay with Paystack (Test)
-        </Button>
-      </div>
-    </div>
+    </section>
   );
 }
