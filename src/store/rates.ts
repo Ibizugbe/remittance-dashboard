@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import type { Currency, RecipientCurrency } from "../types";
+import { getApiErrorMessage } from "../utils/errors";
+import { toast } from "react-toastify";
 
 interface RatesState {
   base: Currency | null;
@@ -10,6 +12,30 @@ interface RatesState {
   fetchRate: (base: Currency, to: RecipientCurrency) => Promise<void>;
 }
 
+const apiBase = (date = "latest") =>
+  `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies`;
+const cfBase = (date = "latest") =>
+  `https://${date}.currency-api.pages.dev/v1/currencies`;
+
+async function fetchRateOnce(base: string, to: string, date = "latest") {
+  const baseL = base.toLowerCase();
+  const toL = to.toLowerCase();
+
+  const urls = [
+    `${apiBase(date)}/${baseL}.json`,
+    `${cfBase(date)}/${baseL}.json`,
+  ];
+
+  for (const url of urls) {
+    const res = await fetch(url);
+    if (!res.ok) continue;
+    const data = await res.json();
+    const rate = data?.[baseL]?.[toL];
+    if (rate != null) return rate;
+  }
+  throw new Error("No rate found");
+}
+
 export const useRatesStore = create<RatesState>((set) => ({
   base: null,
   to: null,
@@ -18,14 +44,12 @@ export const useRatesStore = create<RatesState>((set) => ({
   async fetchRate(base, to) {
     set({ loading: true, error: undefined });
     try {
-      // fawazahmed0 API: https://cdn.jsdelivr.net/gh/fawazahmed0/exchange-api@1/latest/currencies/{baseLower}/{toLower}.json
-      const res = await fetch(
-        `https://cdn.jsdelivr.net/gh/fawazahmed0/exchange-api@1/latest/currencies/${base.toLowerCase()}/${to.toLowerCase()}.json`
-      );
-      const data = await res.json();
-      set({ base, to, rate: data[to.toLowerCase()], loading: false });
+      const rate = await fetchRateOnce(base, to, "latest");
+      set({ base, to, rate, loading: false });
     } catch (e: any) {
-      set({ loading: false, error: "Could not fetch rates" });
+      const message = getApiErrorMessage(e, "Could not fetch rates");
+      set({ loading: false, error: message });
+      toast.error(message, { toastId: "rates-error" });
     }
   },
 }));

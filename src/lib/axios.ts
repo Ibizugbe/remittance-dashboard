@@ -1,16 +1,17 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
 
-export const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE });
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE,
+  timeout: 8000,
+});
 
-// Attach access token
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().tokens?.access_token;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Auto refresh (if api supports refresh tokens)
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
