@@ -29,7 +29,6 @@ export default function Sidebar({
   const [collapsed, setCollapsed] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // Spotlight effect (Aceternity style): set CSS vars on mouse move
   const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const el = ref.current;
     if (!el) return;
@@ -50,7 +49,6 @@ export default function Sidebar({
         collapsed ? "w-[5.25rem]" : "w-[18rem]",
       ].join(" ")}
       style={{
-        // radial spotlight behind content
         backgroundImage:
           "radial-gradient(120px 120px at var(--mx, -200px) var(--my, -200px), rgba(99,102,241,0.10), transparent 70%)",
       }}
@@ -149,7 +147,6 @@ export default function Sidebar({
         </button>
       </nav>
 
-      {/* User footer + collapse toggle */}
       <div className="mt-auto border-t p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
