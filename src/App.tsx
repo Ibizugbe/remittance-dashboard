@@ -1,35 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Outlet, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useAuthStore } from "./store/auth";
+import { Menu, CloseCircle } from "iconsax-reactjs";
+import Nav from "./components/layout/Nav";
+import Brand from "./components/layout/Brand";
+import UserFooter from "./components/layout/UserFooter";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { me, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (open) closeBtnRef.current?.focus();
+  }, [open]);
+
+  const onLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3  bg-white">
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open navigation"
+          className="inline-flex items-center justify-center h-9 w-9 rounded-lg border bg-white hover:bg-slate-50"
+        >
+          <Menu size={18} />
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+        <div className="flex items-center gap-2">
+          <span className="font-bold">RemitX</span>
+        </div>
+        <div className="text-xs text-slate-600">{me?.email}</div>
+      </header>
 
-export default App
+      <div className="lg:grid lg:grid-cols-[18rem_1fr]">
+        {/* Sidebar (desktop) */}
+        <aside className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white">
+          <Brand meEmail={me?.email} />
+          <Nav onLogout={onLogout} />
+          <UserFooter meEmail={me?.email} onLogout={onLogout} />
+        </aside>
+
+        {/* Drawer (mobile) */}
+        {open && (
+          <div
+            className="fixed inset-0 z-40 lg:hidden"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setOpen(false)}
+            />
+            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex-col items-center gap-2">
+                  <div className="font-bold">RemitX</div>
+                  <div className="text-xs text-slate-500">
+                    Secure Cross-Border
+                  </div>
+                </div>
+                <button
+                  ref={closeBtnRef}
+                  onClick={() => setOpen(false)}
+                  aria-label="Close navigation"
+                  className="inline-flex items-center justify-center h-9 w-9 rounded-lg border bg-white hover:bg-slate-50"
+                >
+                  <CloseCircle size={18} />
+                </button>
+              </div>
+              <Nav
+                onLogout={() => {
+                  setOpen(false);
+                  onLogout();
+                }}
+                onNavigate={() => setOpen(false)}
+              />
+              <UserFooter meEmail={me?.email} onLogout={onLogout} />
+            </div>
+          </div>
+        )}
+
+        <main className="p-4 lg:p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
