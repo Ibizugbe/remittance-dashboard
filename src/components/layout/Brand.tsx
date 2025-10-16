@@ -1,6 +1,6 @@
 export default function Brand({ meEmail }: { meEmail?: string }) {
   return (
-    <div className="px-4 py-4 border-b">
+    <div className="px-4 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="font-bold text-lg">RemitX</span>

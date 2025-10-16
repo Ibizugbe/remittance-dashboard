@@ -33,7 +33,6 @@ export default function App() {
         </button>
         <div className="flex items-center gap-2">
           <span className="font-bold">RemitX</span>
-          <span className="text-xs text-slate-500">Secure Cross-Border</span>
         </div>
         <div className="text-xs text-slate-600">{me?.email}</div>
       </header>
@@ -59,11 +58,11 @@ export default function App() {
             />
             <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl flex flex-col">
               <div className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold">RemitX</span>
-                  <span className="text-xs text-slate-500">
+                <div className="flex-col items-center gap-2">
+                  <div className="font-bold">RemitX</div>
+                  <div className="text-xs text-slate-500">
                     Secure Cross-Border
-                  </span>
+                  </div>
                 </div>
                 <button
                   ref={closeBtnRef}
