@@ -4,6 +4,7 @@ import { api } from "../lib/axios";
 import type { AuthTokens, UserProfile } from "../types";
 import { toast } from "react-toastify";
 import { getApiErrorMessage } from "../utils/errors";
+import { toErrorMessage } from "../lib/errors";
 
 interface AuthState {
   tokens: AuthTokens | null;
@@ -33,7 +34,10 @@ export const useAuthStore = create<AuthState>()(
           return true;
         } catch (e: any) {
           const message = getApiErrorMessage(e, "Invalid credentials");
-          set({ loading: false, error: message });
+          set({
+            loading: false,
+            error: toErrorMessage(e, "Invalid credentials"),
+          });
           toast.error(message, { toastId: "login-error" });
           return false;
         }

@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import type { Recipient } from "../types";
 import { getApiErrorMessage } from "../utils/errors";
 import { toast } from "react-toastify";
+import { toErrorMessage } from "../lib/errors";
 
 interface RecipientsState {
   cache: Record<string, Recipient[]>;
@@ -39,7 +40,10 @@ export const useRecipientsStore = create<RecipientsState>()(
           return mapped;
         } catch (e: any) {
           const message = getApiErrorMessage(e, "Could not load recipients");
-          set({ loading: false, error: message });
+          set({
+            loading: false,
+            error: toErrorMessage(e, "Could not load recipients"),
+          });
           toast.error(message, { toastId: `recipients-${nat}-error` });
           return [];
         }

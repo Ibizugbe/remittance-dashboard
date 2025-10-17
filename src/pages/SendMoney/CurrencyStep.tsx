@@ -4,10 +4,11 @@ import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import { useRatesStore } from "../../store/rates";
 import type { Currency, RecipientCurrency } from "../../types";
-import { Flash, Money4 } from "iconsax-reactjs"; // or: @iconsax/react
+import { Flash, Money4 } from "iconsax-reactjs";
 import CurrencyFlag from "../../components/ui/CurrencyFlag";
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
+import { toErrorMessage } from "../../lib/errors";
 
 const Schema = Yup.object({
   amount: Yup.number()
@@ -33,7 +34,6 @@ export default function CurrencyStep(props: {
     if (props.fromCurrency && props.toCurrency) {
       fetchRate(props.fromCurrency, props.toCurrency);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -44,7 +44,6 @@ export default function CurrencyStep(props: {
   }, [rate, loading, error]);
 
   useEffect(() => {
-    // focus and put caret at end on mount
     const el = amountRef.current;
     if (el) {
       el.focus();
@@ -229,7 +228,9 @@ export default function CurrencyStep(props: {
                         </div>
                       </>
                     ) : error ? (
-                      <span className="text-red-600">Couldn’t load rate</span>
+                      <span className="text-red-600">
+                        {toErrorMessage(error, "Couldn’t load rate")}
+                      </span>
                     ) : (
                       <span className="text-slate-400">—</span>
                     )}
