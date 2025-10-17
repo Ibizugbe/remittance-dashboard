@@ -6,6 +6,7 @@ import { Field } from "../components/ui/Field";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../components/ui/Card";
 import { LoginCurve } from "iconsax-reactjs";
+import { toErrorMessage } from "../lib/errors";
 
 const Schema = Yup.object({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -54,7 +55,7 @@ export default function Login() {
               />
               {error && (
                 <div role="alert" className="text-sm text-red-600 mb-2">
-                  {error}
+                  {toErrorMessage(error, "Invalid credentials")}
                 </div>
               )}
               <Button type="submit" disabled={loading} aria-busy={loading} full>

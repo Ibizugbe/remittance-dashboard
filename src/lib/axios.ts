@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
+import { toast } from "react-toastify";
+import { toErrorMessage } from "./errors";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE,
@@ -24,6 +26,7 @@ api.interceptors.response.use(
         return api(config);
       }
     }
+    toast.error(toErrorMessage(error));
     return Promise.reject(error);
   }
 );
